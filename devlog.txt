@@ -16,3 +16,11 @@ P05
 	\____/_/ \_____\/ \___/_/   \_____\/ \_____\/ \_____\/
 ==============================================================
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+vivianT -- 2023-06-03 20:53
+--------------------------------------------------------------
+* Created files
+* Drew basic birds and poop to use for now
+* Created canvas for animation
+* Bird can now go move when user clicks arrow keys and it automatically goes down due to gravity
+==============================================================

@@ -7,38 +7,37 @@ var c = document.getElementById("game");
 
 var ctx = c.getContext("2d");
 
-var bird = new Image();
-bird.src = "birdmid.jpg";
-
-var drawGame = function() {
-    // var rectWidth = 120;
-    // var rectHeight = 60;
-
-    console.log("running drawgame");
-    // ctx.clearRect(0,0,c.width,c.height);
-    ctx.drawImage(bird,c.width/4,c.height,200,220);
-}
-
 var requestID;
 
-var dvdLogoSetup = function() {
+var drawGame = function() {
     window.cancelAnimationFrame(requestID);
 
     var rectWidth = 200;
     var rectHeight = 220;
 
+    //bird coords
     var rectX = 0;
     var rectY = 0;
+
+    //poop coords
+    var poopX = 0;
+    var poopY = 0;
 
     var xVel = 0;
     var yVel = 1;
 
+    var up = false;
+
     var bird = new Image();
     bird.src = "birdmid.jpg";
 
-    var dvdLogo = function() {
+    var poop = new Image();
+    poop.src = "poop.jpg";
+
+    var drawBird = function() {
         ctx.clearRect(0,0,c.width,c.height);
         ctx.drawImage(bird,rectX,rectY,rectWidth,rectHeight);
+        ctx.drawImage(poop,poopX,poopY,75,50);
 
         // x-axis bounds
         // if bird goes beyond left bound
@@ -57,7 +56,9 @@ var dvdLogoSetup = function() {
         }
         //lower bound
         if (rectY + rectHeight > c.height) {
-            yVel = 0;
+            if (!up) {
+                yVel = 0;
+            }
         }
 
         // check if user clicks arrows
@@ -65,7 +66,8 @@ var dvdLogoSetup = function() {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = -1;
+                yVel = -2;
+                up = true;
             } else if (e.keyCode === 40) {
                 //down key
 
@@ -83,6 +85,7 @@ var dvdLogoSetup = function() {
             if (e.keyCode === 38) {
                 //up key
                 yVel = 1;
+                up = false;
             } else if (e.keyCode === 40) {
                 //down key
 
@@ -97,10 +100,11 @@ var dvdLogoSetup = function() {
           
         rectX += xVel;
         rectY += yVel;
+        poopY += 1;
 
-        requestID = window.requestAnimationFrame(dvdLogo);
+        requestID = window.requestAnimationFrame(drawBird);
     };
-    dvdLogo();
+    drawBird();
 };
 
-dvdLogoSetup();
+drawGame();
