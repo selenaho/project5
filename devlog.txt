@@ -24,3 +24,8 @@ vivianT -- 2023-06-03 20:53
 * Created canvas for animation
 * Bird can now go move when user clicks arrow keys and it automatically goes down due to gravity
 ==============================================================
+selenaH -- 2023-06-04 9:23
+--------------------------------------------------------------
+* design doc changes: clarified our general idea based on what people were confused about, name is officially Flappy Turd
+* design doc feedback: flappy turd!!, liked the idea of pooping on humans so that'll be a good stretch goal, confused on how the bird will reappear at the bottom when it flies too high
+==============================================================
