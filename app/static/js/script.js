@@ -30,7 +30,7 @@ var drawGame = function() {
     var up = false;
 
     var bird = new Image();
-    bird.src = "birdmid.jpg";
+    bird.src = "birdmid.PNG";
 
     var poop = new Image();
     poop.src = "poop.jpg";
