@@ -29,3 +29,9 @@ selenaH -- 2023-06-04 9:23
 * design doc changes: clarified our general idea based on what people were confused about, name is officially Flappy Turd
 * design doc feedback: flappy turd!!, liked the idea of pooping on humans so that'll be a good stretch goal, confused on how the bird will reappear at the bottom when it flies too high
 ==============================================================
+WanyingL -- 2023-06-04 21:17
+--------------------------------------------------------------
+* created home page skeleton (buttons and other stuff)
+* created different js for home page for making connection
+* attempted to connect to client using websocket (can't figure out how to do it without node js)
+==============================================================

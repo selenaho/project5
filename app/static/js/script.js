@@ -3,6 +3,7 @@
 // ////2023
 // P05
 
+// make the game ---------------------------------------------------------------------------
 var c = document.getElementById("game");
 
 var ctx = c.getContext("2d");
@@ -108,3 +109,4 @@ var drawGame = function() {
 };
 
 drawGame();
+
