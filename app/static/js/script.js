@@ -8,6 +8,9 @@ var c = document.getElementById("game");
 
 var ctx = c.getContext("2d");
 
+// control panel
+fallVel = 3
+
 var requestID;
 
 var drawGame = function() {
@@ -25,12 +28,12 @@ var drawGame = function() {
     var poopY = 0;
 
     var xVel = 0;
-    var yVel = 1;
+    var yVel = fallVel;
 
     var up = false;
 
     var bird = new Image();
-    bird.src = "birdmid.PNG";
+    bird.src = "birdup.PNG";
 
     var poop = new Image();
     poop.src = "poop.jpg";
@@ -42,12 +45,12 @@ var drawGame = function() {
 
         // x-axis bounds
         // if bird goes beyond left bound
-        if (rectX + rectWidth < 0) {
-            rectX = c.width-rectWidth;
+        if (rectX + rectWidth-20 < 0) {
+            rectX = c.width-20;
         }
         // if bird goes beyond right bound
-        if (rectX > c.width) {
-            rectX = 0;
+        if (rectX+20 > c.width) {
+            rectX = -1*rectWidth+20;
         }
 
         // y-axis bounds
@@ -56,7 +59,7 @@ var drawGame = function() {
             rectY = c.height - rectHeight;
         }
         //lower bound
-        if (rectY + rectHeight > c.height) {
+        if (rectY + rectHeight-100 > c.height) {
             if (!up) {
                 yVel = 0;
             }
@@ -67,17 +70,19 @@ var drawGame = function() {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = -2;
+                yVel = -4;
                 up = true;
             } else if (e.keyCode === 40) {
                 //down key
 
             } else if (e.keyCode === 37) {
                 //left key
-                xVel = -1;
+                bird.src = "birdmid.PNG"
+                xVel = -3;
             } else if (e.keyCode === 39) {
                 //right key
-                xVel = +1;
+                bird.src = "birdmid.PNG"
+                xVel = +3;
             }
           };
 
@@ -85,16 +90,20 @@ var drawGame = function() {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = 1;
+                yVel = fallVel;
                 up = false;
             } else if (e.keyCode === 40) {
                 //down key
 
             } else if (e.keyCode === 37) {
                 //left key
+                bird.src = "birdup.PNG"
+
                 xVel = 0;
             } else if (e.keyCode === 39) {
                 //right key
+                bird.src = "birdup.PNG"
+
                 xVel = 0;
             }
           };
