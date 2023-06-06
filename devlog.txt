@@ -56,3 +56,8 @@ vivianT -- 2023-06-05 22:14
 * Did the pooping using a list and checking if that list has poop in it. Can only poop if list is empty
 * Made bird more animated, flaps wings down when flying up
 ==============================================================
+SelenaH, WanyingL -- 2023-06-05 21:36
+--------------------------------------------------------------
+* when user clicks start new game, their game key is generated (using UUID), and is sent back to client.js where client.js displays the game key in home.html
+>>>>>>> cea302dca6e94c480552191ee7d175261d444b95
+==============================================================
