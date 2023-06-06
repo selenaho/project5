@@ -43,3 +43,7 @@ WanyingL -- 2023-06-05 12:20
 --------------------------------------------------------------
 * created show/hide element for user manual  
 ==============================================================
+SelenaH, WanyingL -- 2023-06-05 21:36
+--------------------------------------------------------------
+* when user clicks start new game, their game key is generated (using UUID), and is sent back to client.js where client.js displays the game key in home.html
+==============================================================
