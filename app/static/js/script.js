@@ -41,10 +41,10 @@ var drawGame = function() {
     var left = false;
 
     var bird = new Image();
-    bird.src = "birdup.PNG";
+    bird.src = "static/assets/birdup.PNG";
 
     var poop = new Image();
-    poop.src = "poop.PNG";
+    poop.src = "static/assets/poop.PNG";
 
     var drawBird = function() {
         ctx.clearRect(0,0,c.width,c.height);
@@ -82,10 +82,10 @@ var drawGame = function() {
 
                 // make bird flap down
                 if (left) {
-                    bird.src = "birddownleft.PNG";
+                    bird.src = "static/assets/birddownleft.PNG";
                 }
                 else {
-                    bird.src = "birddown.PNG";
+                    bird.src = "static/assets/birddown.PNG";
                 }
             } else if (e.keyCode === 40) {
                 //down key
@@ -103,12 +103,12 @@ var drawGame = function() {
             } else if (e.keyCode === 37) {
                 //left key
                 left = true;
-                bird.src = "birdmidleft.PNG"
+                bird.src = "static/assets/birdmidleft.PNG"
                 xVel = -3;
             } else if (e.keyCode === 39) {
                 //right key
                 left = false;
-                bird.src = "birdmid.PNG"
+                bird.src = "static/assets/birdmid.PNG"
                 xVel = +3;
             }
           };
@@ -122,22 +122,22 @@ var drawGame = function() {
 
                 // make bird flap up
                 if (left) {
-                    bird.src = "birdupleft.PNG";
+                    bird.src = "static/assets/birdupleft.PNG";
                 }
                 else {
-                    bird.src = "birdup.PNG";
+                    bird.src = "static/assets/birdup.PNG";
                 }
             } else if (e.keyCode === 40) {
                 //down key
 
             } else if (e.keyCode === 37) {
                 //left key
-                bird.src = "birdupleft.PNG"
+                bird.src = "static/assets/birdupleft.PNG"
 
                 xVel = 0;
             } else if (e.keyCode === 39) {
                 //right key
-                bird.src = "birdup.PNG"
+                bird.src = "static/assets/birdup.PNG"
 
                 xVel = 0;
             }
