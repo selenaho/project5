@@ -43,3 +43,16 @@ WanyingL -- 2023-06-05 12:20
 --------------------------------------------------------------
 * created show/hide element for user manual  
 ==============================================================
+vivianT, anthonyS -- 2023-06-05 14:05
+--------------------------------------------------------------
+* Fixing boundaries so it looks better (when bird hits boundaries: ceiling,ground,right,left)
+* Make bird flap a little, more realistic, but animation not completely there yet bc there's no timer
+* Colored bird red, will make more versions so user can choose colors
+==============================================================
+vivianT -- 2023-06-05 22:14
+--------------------------------------------------------------
+* Added left boolean and sprites facing the left so when user switches direction, bird also flips
+* Made it so that bird can poop everytime user presses down, but can only poop once at a time (poop needs to fall out of screen b4 another poop can poop)
+* Did the pooping using a list and checking if that list has poop in it. Can only poop if list is empty
+* Made bird more animated, flaps wings down when flying up
+==============================================================
