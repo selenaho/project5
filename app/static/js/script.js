@@ -11,6 +11,7 @@ var ctx = c.getContext("2d");
 // control panel
 fallVel = 3;
 poopVel = 4;
+fps = 60;
 
 //poop dimensions
 var poopWidth = 40;
@@ -36,6 +37,9 @@ var drawGame = function() {
 
     var xVel = 0;
     var yVel = fallVel;
+
+    var yAcc = 12;
+    var xAcc = 4;
 
     var up = false;
     var left = false;
@@ -77,7 +81,7 @@ var drawGame = function() {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = -4;
+                yVel = -6;
                 up = true;
 
                 // make bird flap down
@@ -158,7 +162,19 @@ var drawGame = function() {
         rectX += xVel;
         rectY += yVel;
 
+        // yVel += yAcc/fps;
+        // yVel = Math.min(fallVel, yVel);
+
+        // sign = xVel/Math.abs(xVel)
+        // xVel = (sign) * (Math.abs(xVel)-xAcc/fps);
+        // xVel = sign * Math.max(0, Math.abs(xVel));
+        
+        // setTimeout(() => {
+        //     requestID = window.requestAnimationFrame(drawBird);
+        // }, 1000/fps);
+
         requestID = window.requestAnimationFrame(drawBird);
+
     };
     drawBird();
 };
