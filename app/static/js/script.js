@@ -9,9 +9,12 @@ var c = document.getElementById("game");
 var ctx = c.getContext("2d");
 
 // control panel
-fallVel = 3;
-poopVel = 4;
-fps = 60;
+var fallVel = 6;
+var poopVel = 4;
+var flapVel = -6;
+var moveVel = 5;
+var fps = 60;
+var yAcc = 16;
 
 //poop dimensions
 var poopWidth = 40;
@@ -38,8 +41,7 @@ var drawGame = function() {
     var xVel = 0;
     var yVel = fallVel;
 
-    var yAcc = 12;
-    var xAcc = 4;
+
 
     var up = false;
     var left = false;
@@ -112,27 +114,32 @@ var drawGame = function() {
             rectY = c.height - rectHeight;
         }
         //lower bound
-        if (rectY + rectHeight-70 > c.height) {
-            if (!up) {
-                yVel = 0;
-            }
-        }
+        // if (rectY + rectHeight-70 > c.height) {
+        //     if (!up) {
+        //         yVel = 0;
+        //     }
+        // }
 
         // check if user clicks arrows
         document.onkeydown = (e) => {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = -6;
-                up = true;
+                if (yVel > 1) {
+                    yVel = flapVel;
+                    up = true;
+
+                    if (left) {
+                        bird.src = "../static/assets/birddownleft.PNG";
+                    }
+                    else {
+                        bird.src = "../static/assets/birddown.PNG";
+                    }
+                }
+                
 
                 // make bird flap down
-                if (left) {
-                    bird.src = "../static/assets/birddownleft.PNG";
-                }
-                else {
-                    bird.src = "../static/assets/birddown.PNG";
-                }
+
             } else if (e.keyCode === 40) {
                 //down key
                 if (poopList.length === 0) {
@@ -149,13 +156,11 @@ var drawGame = function() {
             } else if (e.keyCode === 37) {
                 //left key
                 left = true;
-                bird.src = "../static/assets/birdmidleft.PNG"
-                xVel = -3;
+                xVel = -1*moveVel;
             } else if (e.keyCode === 39) {
                 //right key
                 left = false;
-                bird.src = "../static/assets/birdmid.PNG"
-                xVel = +3;
+                xVel = moveVel;
             }
           };
 
@@ -163,27 +168,21 @@ var drawGame = function() {
             e = e || window.event;
             if (e.keyCode === 38) {
                 //up key
-                yVel = fallVel;
+                // yVel = fallVel;
                 up = false;
 
                 // make bird flap up
-                if (left) {
-                    bird.src = "../static/assets/birdupleft.PNG";
-                }
-                else {
-                    bird.src = "../static/assets/birdup.PNG";
-                }
+                
             } else if (e.keyCode === 40) {
                 //down key
 
             } else if (e.keyCode === 37) {
                 //left key
-                bird.src = "../static/assets/birdupleft.PNG"
+
 
                 xVel = 0;
             } else if (e.keyCode === 39) {
                 //right key
-                bird.src = "../static/assets/birdup.PNG"
 
                 xVel = 0;
             }
@@ -201,21 +200,47 @@ var drawGame = function() {
             poopY += poopVel;
         }
 
+        if (yVel > 0) {
+            if (left) {
+                bird.src = "../static/assets/birdupleft.PNG";
+            }
+            else {
+                bird.src = "../static/assets/birdup.PNG";
+            }
+        }
+
+        var state = "up";
+        if (Math.abs(xVel) === moveVel) {
+            state="mid";
+            console.log(state)
+        }
+        src = "../static/assets/bird"+state;
+        if (left) {
+            src="../static/assets/bird"+state+"left";
+        }
+        bird.src = src+".PNG";
+        console.log(bird.src);
+
+
+        
+
         rectX += xVel;
         rectY += yVel;
 
-        // yVel += yAcc/fps;
-        // yVel = Math.min(fallVel, yVel);
+        rectY = Math.min(rectY, c.height - rectHeight+70)
+
+        yVel += yAcc/fps;
+        yVel = Math.min(fallVel, yVel);
 
         // sign = xVel/Math.abs(xVel)
         // xVel = (sign) * (Math.abs(xVel)-xAcc/fps);
         // xVel = sign * Math.max(0, Math.abs(xVel));
         
-        // setTimeout(() => {
-        //     requestID = window.requestAnimationFrame(drawBird);
-        // }, 1000/fps);
+        setTimeout(() => {
+            requestID = window.requestAnimationFrame(drawBird);
+        }, 1000/fps);
 
-        requestID = window.requestAnimationFrame(drawBird);
+        // requestID = window.requestAnimationFrame(drawBird);
 
     };
     drawBird();
