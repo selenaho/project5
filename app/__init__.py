@@ -77,10 +77,21 @@ def create_game_id():
 #     print('received json: ' + str(data) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 #     send(username + ' has entered the room.', to=room)
 
+dictionary={}
 @socketio.on('sendusername')
 def on_sendusername():
+    global dictionary
     join_room(game_id)
-    send(username + ' has entered the room.', to=game_id)
+    listKeys=dictionary.keys()
+    if(game_id in listKeys):
+        usernameList = dictionary[game_id]
+        usernameList.append(username)
+        dictionary.update({game_id: usernameList})
+    else:
+        usernameList = []
+        usernameList.append(username)
+        dictionary.update({game_id: usernameList})
+    send(usernameList , to=game_id)
 
 if __name__ == "__main__":
     app.debug = True
