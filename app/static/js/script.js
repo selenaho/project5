@@ -50,8 +50,50 @@ var drawGame = function() {
     var poop = new Image();
     poop.src = "../static/assets/poop.PNG";
 
+    var tree1 = new Image();
+    tree1.src = "../static/assets/tree1.PNG";
+    var tree2 = new Image();
+    tree2.src = "../static/assets/tree2.PNG";
+    var tree3 = new Image();
+    tree3.src = "../static/assets/tree3.PNG";
+    var tree4 = new Image();
+    tree4.src = "../static/assets/tree4.PNG";
+    var tree5 = new Image();
+    tree5.src = "../static/assets/tree5.PNG";
+    var grass = new Image();
+    grass.src = "../static/assets/grass.PNG";
+
+    var cloud1 = new Image();
+    cloud1.src = "../static/assets/cloud1.PNG";
+    var cloud2 = new Image();
+    cloud2.src = "../static/assets/cloud2.PNG";
+    var cloud3 = new Image();
+    cloud3.src = "../static/assets/cloud3.PNG";
+    var cloud4 = new Image();
+    cloud4.src = "../static/assets/cloud4.PNG";
+
+
     var drawBird = function() {
         ctx.clearRect(0,0,c.width,c.height);
+
+        // background color
+        ctx.fillStyle = "rgb(187, 240, 237)";
+        ctx.fillRect(0, 0, c.width, c.height);
+
+        // background images (trees, grass, clouds)
+        ctx.drawImage(grass,0,c.height-50,c.width,50);
+        ctx.drawImage(tree1,20,c.height-220,100,300);
+        ctx.drawImage(tree2,175,c.height-320,100,330);
+        ctx.drawImage(tree3,800,c.height-320,100,320);
+        ctx.drawImage(tree4,500,c.height-190,100,200);
+        ctx.drawImage(tree5,890,c.height-190,100,200);
+        ctx.drawImage(cloud1,175,40,100,80);
+        ctx.drawImage(cloud2,600,70,150,120);
+        ctx.drawImage(cloud3,800,100,130,100);
+        ctx.drawImage(cloud4,50,150,120,100);
+
+
+        // draw bird
         ctx.drawImage(bird,rectX,rectY,rectWidth,rectHeight);
 
         // x-axis bounds

@@ -59,5 +59,8 @@ vivianT -- 2023-06-05 22:14
 SelenaH, WanyingL -- 2023-06-05 21:36
 --------------------------------------------------------------
 * when user clicks start new game, their game key is generated (using UUID), and is sent back to client.js where client.js displays the game key in home.html
->>>>>>> cea302dca6e94c480552191ee7d175261d444b95
+==============================================================
+vivianT -- 2023-06-06 22:52
+--------------------------------------------------------------
+* Drew different types of trees and clouds, and drew grass --> added them to the background of the game, prettier game
 ==============================================================
