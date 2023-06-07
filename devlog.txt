@@ -74,3 +74,12 @@ WanyingL -- 2023-06-07 13:29
 --------------------------------------------------------------
 * message is shown when another user joined 
 ==============================================================
+WanyingL, SelenaH -- 2023-06-07 14:06
+--------------------------------------------------------------
+* updated message shown when users join a room
+* keeps track of number of people in a room and the users in a given room 
+==============================================================
+SelenaH -- 2023-06-07 18:25
+--------------------------------------------------------------
+* updated error messages in different joining scenarios 
+==============================================================

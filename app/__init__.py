@@ -20,6 +20,11 @@ def root():
         print(username)
         if len(game_id) != 5:
             return render_template("home.html", error = "Invalid join code")
+        if game_id in dictionary.keys():
+            if len(dictionary[game_id]) == 2:
+                return render_template("home.html", error = "Room full")
+            if username in dictionary[game_id]:
+                return render_template("home.html", error = "Name taken")
         return redirect(url_for("roomPage", game_id = game_id))
 
 
