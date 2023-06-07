@@ -70,3 +70,7 @@ SelenaH, WanyingL -- 2023-06-06 23:02
 * users have to send username and game code in order to join the game
 * username sent to room after they join the game
 ==============================================================
+WanyingL -- 2023-06-07 13:29
+--------------------------------------------------------------
+* message is shown when another user joined 
+==============================================================

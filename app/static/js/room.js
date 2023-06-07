@@ -25,8 +25,10 @@ socket.on('connect', function () {
 
 socket.on('message', function(message){
     console.log(message);
-    var msg = document.getElementById("msg");
-    msg.innerHTML = message;
+    let msg_list = document.getElementById("msg");
+    let li = document.createElement("li");
+    li.textContent = message;
+    msg_list.appendChild(li);
   });
 
 
