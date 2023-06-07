@@ -19,8 +19,8 @@ bird_color.addEventListener("change", display_chosen_color);
 // connect client ----------------------------------------------------------------------
 var socket = io();
 socket.on('connect', function () {
-    room_id = document.getElementById("game_id").value;
-    socket.emit('join', { username: 'lol', room: room_id });
+    socket.emit('my event', { data: 'I\'m in the room!' });
+    socket.emit('sendusername')
 });
 
 socket.on('message', function(message){

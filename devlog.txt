@@ -61,3 +61,9 @@ SelenaH, WanyingL -- 2023-06-05 21:36
 * when user clicks start new game, their game key is generated (using UUID), and is sent back to client.js where client.js displays the game key in home.html
 >>>>>>> cea302dca6e94c480552191ee7d175261d444b95
 ==============================================================
+SelenaH, WanyingL -- 2023-06-06 23:02
+--------------------------------------------------------------
+* game key no longer based on UUID
+* users have to send username and game code in order to join the game
+* username sent to room after they join the game
+==============================================================
