@@ -22,13 +22,13 @@
      <h3>Team members: Selena Ho (PM), Wanying Li, Vivian Teo, Anthony Sun</h3>
      <br>
 
-     <button id="btnStart">Start a new game</button>
+     <button id="btnCreate">Create a new game</button>
      <br><br>
      <div id="joinCode"></div>
 
      <form action="/" method="POST">
           <button id="btnJoin">Join a game</button>
-          <input type="text" id="gameId" name="game_id" placeholder="enter your game ID"> 
+          <input type="text" id="gameId" name="game_id" placeholder="enter your game ID">
      </form>
 
      <p>{{error}}</p>
@@ -41,11 +41,10 @@
      </details>
 
      <br><br>
-     <a href="/game">(temporary)link to game</a>
 
 
 
-
+     <!--order the script matters for some reason-->
      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
           integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
           crossorigin="anonymous"></script>

@@ -26,18 +26,28 @@
 
   <h1>Welcome to room {{game_id}}</h1>
   <br><br>
+  <input type="hidden" id="game_id" value={{game_id}}>
 
   <label for="birdColor" class="form-label">Choose your bird color: </label>
   <input type="color" class="m-auto form-control form-control-color form-control-lg" id="birdColor" value="#0680ff">
   <br><br>
 
   <div id="selectedColor"></div>
+  <br><br>
+  <div id="msg"></div>
 
+  <form action="/game/{{game_id}}" method="POST">
+    <button id="btnStart">Start the game</button>
+  </form>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+  integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+  crossorigin="anonymous"></script>
 
   <!-- our js -->
   <script src="../static/js/room.js"></script>
-  
+
+
 </body>
 
 </html>

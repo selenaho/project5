@@ -14,7 +14,7 @@ socket.on('connect', function () {
   socket.emit('my event', { data: 'I\'m connected!' });
 });
 
-var create_game_id = document.getElementById("btnStart");
+var create_game_id = document.getElementById("btnCreate");
 var send_id = () => {
   socket.emit("I want a game id")
 }

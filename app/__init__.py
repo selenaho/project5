@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template, request, session, url_for
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import random
 import string
 import uuid
@@ -23,11 +23,12 @@ def roomPage(game_id):
     if request.method == "GET":
         return render_template("room.html", game_id = game_id)
     else:
+        # need to if statement to check if the room has two ppl before directing them to game page
         return redirect(url_for("gamePage", game_id = game_id))
 
 @app.route("/game/<game_id>", methods=['GET', 'POST'])
 def gamePage(game_id):
-    return render_template("game.html")
+    return render_template("game.html", game_id = game_id)
 
 # @socketio.on('message')
 # def handle_message(data):
@@ -35,7 +36,7 @@ def gamePage(game_id):
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+    print('received json: ' + str(json) + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
 
 @socketio.on('I want a game id')
@@ -56,6 +57,17 @@ def create_game_id():
     send(str(key))
     
 
+# @socketio.on('joined room')
+# def client_in_room(json):
+#     print('received json: ' + str(json) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    print('received json: ' + str(data) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    send(username + ' has entered the room.', to=room)
 
 if __name__ == "__main__":
     app.debug = True
