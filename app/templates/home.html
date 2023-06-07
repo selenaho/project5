@@ -22,13 +22,16 @@
      <h3>Team members: Selena Ho (PM), Wanying Li, Vivian Teo, Anthony Sun</h3>
      <br>
 
-     <button id="btnCreate">Create a new game</button>
+     <button id="btnCreate">Get a join code</button>
      <br><br>
      <div id="joinCode"></div>
 
+
      <form action="/" method="POST">
-          <button id="btnJoin">Join a game</button>
           <input type="text" id="gameId" name="game_id" placeholder="enter your game ID">
+          <input type="text" id="username" name="username" placeholder="enter your name">
+          <button id="btnJoin">Join a game</button>
+          
      </form>
 
      <p>{{error}}</p>

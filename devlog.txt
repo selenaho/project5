@@ -64,3 +64,9 @@ vivianT -- 2023-06-06 22:52
 --------------------------------------------------------------
 * Drew different types of trees and clouds, and drew grass --> added them to the background of the game, prettier game
 ==============================================================
+SelenaH, WanyingL -- 2023-06-06 23:02
+--------------------------------------------------------------
+* game key no longer based on UUID
+* users have to send username and game code in order to join the game
+* username sent to room after they join the game
+==============================================================
