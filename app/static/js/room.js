@@ -31,4 +31,18 @@ socket.on('message', function(message){
     msg_list.appendChild(li);
   });
 
+var checkboxClicked = (checkbox) => {
+    if (checkbox.checked) {
+        //alert("checked")
+        socket.emit('checked')
+    } 
+    else {
+        socket.emit('unchecked')
+        //alert("unchecked")
+    }
+}
 
+socket.on('readyToPlay', function(){
+    console.log("READY TO PLAY")
+    socket.emit('sendToGame');
+});

@@ -83,3 +83,9 @@ SelenaH -- 2023-06-07 18:25
 --------------------------------------------------------------
 * updated error messages in different joining scenarios 
 ==============================================================
+SelenaH -- 2023-06-07 21:24
+--------------------------------------------------------------
+* currently when users are in the room there's a checkbox to signal if they're ready
+* once both checkboxes are checked both users are supposed to be redirected to the game page but it's not redirecting
+* is printing "send to game" but not actually redirecting
+==============================================================

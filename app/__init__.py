@@ -34,6 +34,10 @@ def roomPage(game_id):
         return render_template("room.html", game_id = game_id)
     else:
         # need to if statement to check if the room has two ppl before directing them to game page
+        if len(dictionary[game_id]) < 2:
+            return render_template("room.html", game_id = game_id, error= "Not enough players")
+        if readyDictionary[game_id] < 2:
+            return render_template("room.html", game_id = game_id, error = "Not everybody is ready")
         return redirect(url_for("gamePage", game_id = game_id))
 
 @app.route("/game/<game_id>", methods=['GET', 'POST'])
@@ -82,7 +86,7 @@ def create_game_id():
 #     print('received json: ' + str(data) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 #     send(username + ' has entered the room.', to=room)
 
-dictionary={}
+dictionary={} #keeps track of the usernames in a game room {game_id:[usernames]}
 @socketio.on('sendusername')
 def on_sendusername():
     global dictionary
@@ -97,6 +101,31 @@ def on_sendusername():
         usernameList.append(username)
         dictionary.update({game_id: usernameList})
     send(usernameList , to=game_id)
+
+readyDictionary={} #keeps track of how many players in a given room are ready to start the game
+@socketio.on('checked')
+def on_checked():
+    global readyDictionary
+    keys = readyDictionary.keys()
+    if (game_id in keys):
+        curr = readyDictionary[game_id] + 1
+        readyDictionary.update({game_id: curr})
+    else:
+        readyDictionary.update({game_id: 1})
+    if (readyDictionary[game_id] == 2):
+        send("READY TO PLAY" , to=game_id)
+        emit('readyToPlay', to=game_id)
+    
+@socketio.on('unchecked')
+def on_unchecked():
+    global readyDictionary
+    curr = readyDictionary[game_id] - 1
+    readyDictionary.update({game_id: curr})
+
+@socketio.on('sendToGame')
+def on_sendToGame():
+    print("SEND TO GAME")
+    return redirect(url_for("gamePage", game_id = game_id))
 
 if __name__ == "__main__":
     app.debug = True
