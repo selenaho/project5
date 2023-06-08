@@ -89,3 +89,8 @@ SelenaH -- 2023-06-07 21:24
 * once both checkboxes are checked both users are supposed to be redirected to the game page but it's not redirecting
 * is printing "send to game" but not actually redirecting
 ==============================================================
+SelenaH -- 2023-06-07 22:22
+--------------------------------------------------------------
+* bug fixed
+* when both players have checkboxed checked, they get sent to the game
+==============================================================

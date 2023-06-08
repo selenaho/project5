@@ -32,13 +32,13 @@ def root():
 def roomPage(game_id):
     if request.method == "GET":
         return render_template("room.html", game_id = game_id)
-    else:
-        # need to if statement to check if the room has two ppl before directing them to game page
-        if len(dictionary[game_id]) < 2:
-            return render_template("room.html", game_id = game_id, error= "Not enough players")
-        if readyDictionary[game_id] < 2:
-            return render_template("room.html", game_id = game_id, error = "Not everybody is ready")
-        return redirect(url_for("gamePage", game_id = game_id))
+    # else:
+    #     # need to if statement to check if the room has two ppl before directing them to game page
+    #     if len(dictionary[game_id]) < 2:
+    #         return render_template("room.html", game_id = game_id, error= "Not enough players")
+    #     if readyDictionary[game_id] < 2:
+    #         return render_template("room.html", game_id = game_id, error = "Not everybody is ready")
+    #     return redirect(url_for("gamePage", game_id = game_id))
 
 @app.route("/game/<game_id>", methods=['GET', 'POST'])
 def gamePage(game_id):
@@ -113,8 +113,9 @@ def on_checked():
     else:
         readyDictionary.update({game_id: 1})
     if (readyDictionary[game_id] == 2):
-        send("READY TO PLAY" , to=game_id)
-        emit('readyToPlay', to=game_id)
+        #send("READY TO PLAY" , to=game_id)
+        #print(app.root_path)
+        emit('readyToPlay', game_id, to=game_id)
     
 @socketio.on('unchecked')
 def on_unchecked():
@@ -122,10 +123,10 @@ def on_unchecked():
     curr = readyDictionary[game_id] - 1
     readyDictionary.update({game_id: curr})
 
-@socketio.on('sendToGame')
-def on_sendToGame():
-    print("SEND TO GAME")
-    return redirect(url_for("gamePage", game_id = game_id))
+# @socketio.on('sendToGame')
+# def on_sendToGame():
+#     print("SEND TO GAME")
+#     return redirect(url_for("gamePage", game_id = game_id))
 
 if __name__ == "__main__":
     app.debug = True

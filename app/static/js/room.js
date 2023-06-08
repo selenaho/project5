@@ -42,7 +42,11 @@ var checkboxClicked = (checkbox) => {
     }
 }
 
-socket.on('readyToPlay', function(){
+socket.on('readyToPlay', function(id){
     console.log("READY TO PLAY")
-    socket.emit('sendToGame');
+    //console.log(window.location.host)
+    host = window.location.host
+    destination = '/game/' + id
+    window.location.pathname = destination
+    //socket.emit('sendToGame');
 });
