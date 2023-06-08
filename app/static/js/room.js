@@ -23,26 +23,31 @@ socket.on('connect', function () {
     socket.emit('sendusername')
 });
 
-socket.on('message', function(message){
+socket.on('message', function (message) {
     console.log(message);
-    let msg_list = document.getElementById("msg");
-    let li = document.createElement("li");
-    li.textContent = message;
-    msg_list.appendChild(li);
-  });
+    // let msg_list = document.getElementById("msg");
+    // let li = document.createElement("li");
+    // li.textContent = message;
+    // msg_list.appendChild(li);
+
+    var msg = document.getElementById("msg");
+    msg.innerHTML = "<p>User(s) in this room: " + message + "</p>";
+});
+
+
 
 var checkboxClicked = (checkbox) => {
     if (checkbox.checked) {
         //alert("checked")
         socket.emit('checked')
-    } 
+    }
     else {
         socket.emit('unchecked')
         //alert("unchecked")
     }
 }
 
-socket.on('readyToPlay', function(id){
+socket.on('readyToPlay', function (id) {
     console.log("READY TO PLAY")
     //console.log(window.location.host)
     host = window.location.host

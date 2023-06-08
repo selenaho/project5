@@ -94,8 +94,11 @@ def on_sendusername():
     listKeys=dictionary.keys()
     if(game_id in listKeys):
         usernameList = dictionary[game_id]
-        usernameList.append(username)
-        dictionary.update({game_id: usernameList})
+        if (username in usernameList):
+            pass
+        else: 
+            usernameList.append(username)
+            dictionary.update({game_id: usernameList})
     else:
         usernameList = []
         usernameList.append(username)
