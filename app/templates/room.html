@@ -16,6 +16,7 @@
 </head>
 
 <body>
+  <div style="display:none" id="username">{{username}}</div>
   <!--
     game id displayed
     choose bird color
@@ -26,14 +27,16 @@
 
   <h1>Welcome to room {{game_id}}</h1>
   <br><br>
-  <input type="hidden" id="game_id" value={{game_id}}>
 
-  <label for="birdColor" class="form-label">Choose your bird color: </label>
-  <input type="color" class="m-auto form-control form-control-color form-control-lg" id="birdColor" value="#0680ff">
+  <!--
+  <select id="birdColor" onchange="formChange()">
+    <option value="green">green</option>
+    <option value="red">red</option>
+  </select>
   <br><br>
 
   <div id="selectedColor"></div>
-  <br><br>
+  <br><br>-->
   <!--
   <ul id="msg"></ul>-->
   <div id="msg"></div>

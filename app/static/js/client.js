@@ -10,15 +10,13 @@
 // connect client ----------------------------------------------------------------------
 
 var socket = io();
-socket.on('connect', function () {
-  socket.emit('my event', { data: 'I\'m connected!' });
-});
+
 
 var create_game_id = document.getElementById("btnCreate");
-var send_id = () => {
+
+create_game_id.addEventListener("click", () => {
   socket.emit("I want a game id");
-}
-create_game_id.addEventListener("click", send_id);
+});
 
 // socket.onmessage = function(e){
 //   var server_message = e.data;

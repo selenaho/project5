@@ -5,8 +5,15 @@ import string
 import uuid
 
 app = Flask(__name__) 
-#if things don't work maybe we need a secret key
-socketio = SocketIO(app)
+app.secret_key="asldkfjalko3inf2309urehdn"
+socketio = SocketIO(app, manage_session=False)
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+games = {}
+# { <game_id>: {usernames: [<user>], ready: [<user>], <color>: (<x>,<y>)} }
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -14,44 +21,31 @@ def root():
     if request.method == "GET":
         return render_template("home.html")
     else:
-        global username, game_id
         game_id = request.form.get("game_id")
         username = request.form.get("username")
-        print(username)
+
         if len(game_id) != 5:
             return render_template("home.html", error = "Invalid join code")
-        if game_id in dictionary.keys():
-            if len(dictionary[game_id]) == 2:
+        if game_id in games:
+            if len(games[game_id]) == 2:
                 return render_template("home.html", error = "Room full")
-            if username in dictionary[game_id]:
+            if username in games[game_id]:
                 return render_template("home.html", error = "Name taken")
+        session['username']=username
         return redirect(url_for("roomPage", game_id = game_id))
 
 
+# TODO: check if gameid in games
 @app.route("/room/<game_id>", methods=['GET', 'POST'])
 def roomPage(game_id):
-    if request.method == "GET":
-        return render_template("room.html", game_id = game_id)
-    # else:
-    #     # need to if statement to check if the room has two ppl before directing them to game page
-    #     if len(dictionary[game_id]) < 2:
-    #         return render_template("room.html", game_id = game_id, error= "Not enough players")
-    #     if readyDictionary[game_id] < 2:
-    #         return render_template("room.html", game_id = game_id, error = "Not everybody is ready")
-    #     return redirect(url_for("gamePage", game_id = game_id))
+    print(session)
+    return render_template("room.html", username=session['username'])
 
-@app.route("/game/<game_id>", methods=['GET', 'POST'])
+
+@app.route("/game/<game_id>")
 def gamePage(game_id):
-    print(username + "FDSLKSFKJLAKFA")
-    return render_template("game.html", game_id = game_id)
-
-# @socketio.on('message')
-# def handle_message(data):
-#     print('received message: ' + data)
-
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    print('received json: ' + str(json) + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print(session)
+    return render_template("game.html", color=session.get('color'))
 
 
 @socketio.on('I want a game id')
@@ -71,60 +65,51 @@ def create_game_id():
     # print("receiving client request")    
     send(str(key))
 
-
-
-
-# @socketio.on('joined room')
-# def client_in_room(json):
-#     print('received json: ' + str(json) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
-# @socketio.on('join')
-# def on_join(data):
-#     username = data['username']
-#     room = data['room']
-#     join_room(room)
-#     print('received json: ' + str(data) + '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-#     send(username + ' has entered the room.', to=room)
-
-dictionary={} #keeps track of the usernames in a game room {game_id:[usernames]}
+# doesnt work if user leaves room though
 @socketio.on('sendusername')
-def on_sendusername():
-    global dictionary
+def on_sendusername(data):
+    game_id = data['game_id']
     join_room(game_id)
-    listKeys=dictionary.keys()
-    if(game_id in listKeys):
-        usernameList = dictionary[game_id]
-        if (username in usernameList):
-            pass
-        else: 
-            usernameList.append(username)
-            dictionary.update({game_id: usernameList})
-    else:
-        usernameList = []
-        usernameList.append(username)
-        dictionary.update({game_id: usernameList})
-    send(usernameList , to=game_id)
 
-readyDictionary={} #keeps track of how many players in a given room are ready to start the game
-@socketio.on('checked')
-def on_checked():
-    global readyDictionary
-    keys = readyDictionary.keys()
-    if (game_id in keys):
-        curr = readyDictionary[game_id] + 1
-        readyDictionary.update({game_id: curr})
+    if game_id in games and data['username'] not in games[game_id]['usernames']:
+        games[game_id]['usernames'].append(data['username'])
     else:
-        readyDictionary.update({game_id: 1})
-    if (readyDictionary[game_id] == 2):
-        #send("READY TO PLAY" , to=game_id)
-        #print(app.root_path)
+        games[game_id] = {'usernames': [data['username']]}
+    send(games[game_id]['usernames'] , to=game_id)
+
+@socketio.on('checked')
+def on_checked(data):
+    game_id = data['game_id']
+    if 'ready' in games[game_id]:
+        games[game_id]['ready'].append(data['username'])
+    else:
+        games[game_id]['ready']=[data['username']]
+    print(games)
+    if len(games[game_id]['ready']) >= 2:
+        session['color'] = ("red","green")[games[game_id]['ready'].index(data['username'])]
+        print("onchecked:"+str(session))
         emit('readyToPlay', game_id, to=game_id)
+
     
 @socketio.on('unchecked')
-def on_unchecked():
-    global readyDictionary
-    curr = readyDictionary[game_id] - 1
-    readyDictionary.update({game_id: curr})
+def on_unchecked(data):
+    game_id = data['game_id']
+    games[game_id]['ready'].remove(data['username'])
+
+bird_positions = {}
+# { game_id: {color: (x,y)} }
+
+@socketio.on("gamestart")
+def on_start(color):
+    if bird_positions:
+        bird_positions[color] = (800,0)
+    else:
+        bird_positions[color] = (0,0)
+
+@socketio.on('keystroke')
+def on_keystroke(data):
+    pass
+
 
 # @socketio.on('sendToGame')
 # def on_sendToGame():
