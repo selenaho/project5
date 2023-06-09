@@ -1,11 +1,26 @@
-console.log(document.getElementById("color").innerHTML)
+// Silly Billy Likes Willy
+// SoftDev pd8
+// ////2023
+// P05
 
-// // Silly Billy Likes Willy
-// // SoftDev pd8
-// // ////2023
-// // P05
+var color = document.getElementById("color").innerHTML;
 
-// // make the game ---------------------------------------------------------------------------
+var c = document.getElementById("canvas");
+var ctx = c.getContext("2d");
+
+//poop dimensions
+var poopWidth = 40;
+var poopHeight = 35;
+
+// bird dimensions
+var birdImgWidth = 200;
+var birdImgHeight = 220;
+
+socket.on("draw", (x,y, birdDir) => {
+    ctx.drawImage(color+"bird"+birdDir+".PNG",x,y,birdImgWidth,birdImgHeight);
+})
+
+// make the game ---------------------------------------------------------------------------
 // var c = document.getElementById("game");
 
 // var ctx = c.getContext("2d");
