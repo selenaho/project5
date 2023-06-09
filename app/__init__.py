@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, flash, get_flashed_messages
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import random
 import string
@@ -31,22 +31,21 @@ def root():
                 return render_template("home.html", error = "Room full")
             if username in games[game_id]:
                 return render_template("home.html", error = "Name taken")
-        session['username']=username
+        flash(username)
         return redirect(url_for("roomPage", game_id = game_id))
 
 
 # TODO: check if gameid in games
 @app.route("/room/<game_id>", methods=['GET', 'POST'])
 def roomPage(game_id):
-    print(session)
-    return render_template("room.html", username=session['username'])
+    return render_template("room.html", username=get_flashed_messages()[0])
 
 
-@app.route("/game/<game_id>")
+@app.route("/game/<game_id>", methods=['GET', 'POST'])
 def gamePage(game_id):
-    print(session)
-    return render_template("game.html", color=session.get('color'))
-
+    if request.method == "POST":
+        return render_template("game.html", color=request.form.get("color"))
+    return redirect(url_for('root'))
 
 @socketio.on('I want a game id')
 def create_game_id():
@@ -84,10 +83,10 @@ def on_checked(data):
         games[game_id]['ready'].append(data['username'])
     else:
         games[game_id]['ready']=[data['username']]
-    print(games)
+    color=("red","green")[games[game_id]['ready'].index(data['username'])]
+
+    emit('color', [data['username'], color],to=game_id)
     if len(games[game_id]['ready']) >= 2:
-        session['color'] = ("red","green")[games[game_id]['ready'].index(data['username'])]
-        print("onchecked:"+str(session))
         emit('readyToPlay', game_id, to=game_id)
 
     

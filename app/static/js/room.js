@@ -20,6 +20,8 @@
 //     color = document.getElementById("birdColor").value
 // }
 
+var color = null;
+
 var data = {
     game_id: window.location.href.split("/").pop().slice(0,5),
     username: document.getElementById("username").innerHTML
@@ -32,7 +34,7 @@ socket.on('connect', function () {
 });
 
 socket.on('message', function (message) {
-    console.log(message);
+    // console.log(message);
     // let msg_list = document.getElementById("msg");
     // let li = document.createElement("li");
     // li.textContent = message;
@@ -52,11 +54,34 @@ var checkboxClicked = (checkbox) => {
     }
 };
 
+socket.on("color", (colorinfo) => {
+    if (colorinfo[0] == data['username']) {
+        color = colorinfo[1]
+    }
+})
+
 socket.on('readyToPlay', function (id) {
-    console.log("READY TO PLAY");
-    //console.log(window.location.host)
-    host = window.location.host;
     destination = '/game/' + id;
-    window.location.pathname = destination;
+    
+    const form = document.createElement('form');
+
+    form.method = 'POST';
+    form.action = destination;
+    const inputField1 = document.createElement('input');
+    inputField1.type = 'text';
+    inputField1.name = 'color';
+    inputField1.value = color;
+
+    form.appendChild(inputField1);
+    document.body.appendChild(form);
+
+    form.submit();
+
+    // console.log("READY TO PLAY");
+    // //console.log(window.location.host)
+    // host = window.location.host;
+
+
+    // window.location.pathname = destination;
     //socket.emit('sendToGame');
 });
