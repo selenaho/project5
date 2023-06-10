@@ -8,9 +8,9 @@ app = Flask(__name__)
 app.secret_key="asldkfjalko3inf2309urehdn"
 socketio = SocketIO(app, manage_session=False)
 
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+# import logging
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 
 games = {}
 # { <game_id>: {usernames: [<user>], ready: [<user>], <color>: (<x>,<y>)} }
@@ -32,6 +32,7 @@ def root():
             if username in games[game_id]:
                 return render_template("home.html", error = "Name taken")
         flash(username)
+        input()
         return redirect(url_for("roomPage", game_id = game_id))
 
 
@@ -95,19 +96,45 @@ def on_unchecked(data):
     game_id = data['game_id']
     games[game_id]['ready'].remove(data['username'])
 
+
 bird_positions = {}
-# { game_id: {color: (x,y)} }
+# { game_id: {
+#   <color>: {
+#       x: <x>,
+#       y: <y>,
+#       dir: <dir>
+#   }
+# } }
+
+def draw(game_id):
+    print(bird_positions)
+    print(game_id)
 
 @socketio.on("gamestart")
-def on_start(color):
-    if bird_positions:
-        bird_positions[color] = (800,0)
+def on_start(data):
+    global bird_positions
+    print("gamestart")
+    game_id=data['game_id']
+    color=data['color']
+    print(game_id, color)
+    if game_id in bird_positions:
+        bird_positions[game_id][color] = {'x': 800, 'y': 0, 'dir': 'upleft'}
     else:
-        bird_positions[color] = (0,0)
+        bird_positions[game_id] = {color: {'x': 0, 'y': 0, 'dir': 'up'}}
+    emit('draw', bird_positions, to=game_id)
 
-@socketio.on('keystroke')
+
+@socketio.on('frame')
 def on_keystroke(data):
-    pass
+    global bird_positions
+    if data['key'] == None: # TODO: check if this is the case
+        pass
+        # <normal gravity>
+    else:
+        pass
+        # adjust bird according to keystroke
+    
+    draw(data['game_id'])
 
 
 # @socketio.on('sendToGame')

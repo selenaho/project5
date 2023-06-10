@@ -67,6 +67,7 @@ socket.on('readyToPlay', function (id) {
 
     form.method = 'POST';
     form.action = destination;
+    form.style.display = "none";
     const inputField1 = document.createElement('input');
     inputField1.type = 'text';
     inputField1.name = 'color';

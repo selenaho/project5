@@ -5,6 +5,12 @@
 
 var color = document.getElementById("color").innerHTML;
 
+var data = {
+    game_id: window.location.href.split("/").pop().slice(0,5),
+    color: color,
+    key: null
+};
+
 var c = document.getElementById("canvas");
 var ctx = c.getContext("2d");
 
@@ -16,9 +22,46 @@ var poopHeight = 35;
 var birdImgWidth = 200;
 var birdImgHeight = 220;
 
-socket.on("draw", (x,y, birdDir) => {
-    ctx.drawImage(color+"bird"+birdDir+".PNG",x,y,birdImgWidth,birdImgHeight);
-})
+var socket = io();
+socket.on('connect', function () {
+    socket.emit('gamestart', data);
+});
+
+socket.on('draw', function (bird_positions) {
+    console.log("HERE!!!!!!!!!!!!!!!!");
+    console.log(color);
+    console.log(bird_positions);
+
+    for (color of bird_positions[data['game_id']]) {
+        console.log(color);
+        ctx.drawImage("../static/assets/"+color+"bird"+birdDir+".PNG",x,y,birdImgWidth,birdImgHeight);
+    }
+    
+}); 
+
+// dict
+// Color
+// key pressed
+// 
+
+var requestID;
+
+var drawGame = function() {
+    window.cancelAnimationFrame(requestID);
+    
+    socket.emit('frame')
+
+
+
+    setTimeout(() => {
+        requestID = window.requestAnimationFrame(drawGame);
+    }, 1000/fps);
+}
+
+
+
+//drawgame emits event frame --> __init__ --> sends event called draw
+
 
 // make the game ---------------------------------------------------------------------------
 // var c = document.getElementById("game");
