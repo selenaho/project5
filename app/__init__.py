@@ -2,15 +2,14 @@ from flask import Flask, redirect, render_template, request, session, url_for, f
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import random
 import string
-import uuid
 
 app = Flask(__name__) 
 app.secret_key="asldkfjalko3inf2309urehdn"
 socketio = SocketIO(app, manage_session=False)
 
-# import logging
-# log = logging.getLogger('werkzeug')
-# log.setLevel(logging.ERROR)
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 games = {}
 # { <game_id>: {usernames: [<user>], ready: [<user>], <color>: (<x>,<y>)} }
@@ -32,7 +31,6 @@ def root():
             if username in games[game_id]:
                 return render_template("home.html", error = "Name taken")
         flash(username)
-        input()
         return redirect(url_for("roomPage", game_id = game_id))
 
 
@@ -48,6 +46,8 @@ def gamePage(game_id):
         return render_template("game.html", color=request.form.get("color"))
     return redirect(url_for('root'))
 
+## socket-------------------------------------------------------
+# home socket-------------------------------------------------
 @socketio.on('I want a game id')
 def create_game_id():
     #random letters
@@ -58,13 +58,10 @@ def create_game_id():
     digits = string.digits
     nums = ''.join(random.choice(digits) for i in range(2)) 
 
-    key = word + nums
-    # print(key)
-    # key = uuid.uuid4()
-    # print(key)
-    # print("receiving client request")    
+    key = word + nums   
     send(str(key))
 
+# room socket--------------------------------------------------------------
 # doesnt work if user leaves room though
 @socketio.on('sendusername')
 def on_sendusername(data):
@@ -96,6 +93,7 @@ def on_unchecked(data):
     game_id = data['game_id']
     games[game_id]['ready'].remove(data['username'])
 
+# game socket------------------------------------------------------------------
 
 bird_positions = {}
 # { game_id: {
@@ -106,41 +104,99 @@ bird_positions = {}
 #   }
 # } }
 
-def draw(game_id):
-    print(bird_positions)
-    print(game_id)
 
 @socketio.on("gamestart")
 def on_start(data):
     global bird_positions
-    print("gamestart")
+    
+    
     game_id=data['game_id']
+
+    join_room(game_id)
+
     color=data['color']
-    print(game_id, color)
     if game_id in bird_positions:
-        bird_positions[game_id][color] = {'x': 800, 'y': 0, 'dir': 'upleft'}
+        bird_positions[game_id][color] = {
+            'x': 800, 'y': 0, 'dir': 'upleft',
+            'xVel': 0, 'yVel':0, 'isLeft':"left"}
+        emit('draw', bird_positions, to=game_id)
     else:
-        bird_positions[game_id] = {color: {'x': 0, 'y': 0, 'dir': 'up'}}
+        bird_positions[game_id] = {color: {
+            'x': 0, 'y': 0, 'dir': 'up',
+            'xVel': 0, 'yVel':0, 'isLeft':""}}
+
+
+@socketio.on('frame') #TODO: Check points each frame
+def frame(data):
+    global bird_positions
+    game_id=data['game_id']
+
+    # data
+    birdImgWidth = 200
+    birdImgHeight = 220
+
+    #terminal velocity
+    fallVel = 6
+
+    # velocity when first flap
+    flapVel = -6
+
+    # xVel
+    moveVel = 5
+    
+    fps = 60
+    
+    # in relation to fps
+    yAcc = 16
+    
+    #kinematic variables
+    kin_var = bird_positions[game_id][data['color']]
+
+    #bounds, acceleration
+    kin_var['yVel'] = min(kin_var['yVel']+yAcc/fps, fallVel)
+
+    #x-axis bounds
+    #if bird goes beyond left bound
+    if (kin_var['x'] + birdImgWidth-20 < 0):
+        kin_var['x'] = 1000-20
+    #if bird goes beyond right bound
+    if (kin_var['x']+20 > 1000):
+        kin_var['x'] = -1*birdImgWidth+20
+
+    #y-axis bounds
+    #hits upper bound
+    if (kin_var['y'] + birdImgHeight < 0):
+        kin_var['y'] = 600 - birdImgHeight
+    #lower bound
+    if (kin_var['y'] + birdImgHeight-70 > 600):
+        if (data['key']!='up'):
+            kin_var['yVel'] = 0
+    
+    if data['key'] == None:
+        kin_var['xVel'] = 0
+        kin_var['dir'] = 'up'+kin_var['isLeft']
+    else:
+        if data['key'] == "up":
+            kin_var['yVel'] = flapVel
+            kin_var['dir'] = 'down'+kin_var['isLeft']
+        elif data['key'] == "left":
+            kin_var['xVel'] = -1*moveVel
+            kin_var['isLeft'] = 'left'
+            kin_var['dir'] = 'mid'+kin_var['isLeft']
+        elif data['key'] == "right":
+            kin_var['xVel'] = moveVel
+            kin_var['isLeft'] = ''
+            kin_var['dir'] = 'mid'+kin_var['isLeft']
+        elif data['key'] == "down":
+            kin_var['yVel'] = flapVel*1.5 
+            kin_var['dir'] = 'down'+kin_var['isLeft']
+
+        # adjust bird according to keystroke
+    kin_var['x'] += kin_var['xVel']
+    kin_var['y'] += kin_var['yVel']
+    
     emit('draw', bird_positions, to=game_id)
 
-
-@socketio.on('frame')
-def on_keystroke(data):
-    global bird_positions
-    if data['key'] == None: # TODO: check if this is the case
-        pass
-        # <normal gravity>
-    else:
-        pass
-        # adjust bird according to keystroke
-    
-    draw(data['game_id'])
-
-
-# @socketio.on('sendToGame')
-# def on_sendToGame():
-#     print("SEND TO GAME")
-#     return redirect(url_for("gamePage", game_id = game_id))
 
 if __name__ == "__main__":
     app.debug = True

@@ -14,6 +14,8 @@ var data = {
 var c = document.getElementById("canvas");
 var ctx = c.getContext("2d");
 
+var fps=60;
+
 //poop dimensions
 var poopWidth = 40;
 var poopHeight = 35;
@@ -27,36 +29,86 @@ socket.on('connect', function () {
     socket.emit('gamestart', data);
 });
 
-socket.on('draw', function (bird_positions) {
-    console.log("HERE!!!!!!!!!!!!!!!!");
-    console.log(color);
-    console.log(bird_positions);
+var tree1 = new Image();
+tree1.src = "../static/assets/tree1.PNG";
+var tree2 = new Image();
+tree2.src = "../static/assets/tree2.PNG";
+var tree3 = new Image();
+tree3.src = "../static/assets/tree3.PNG";
+var tree4 = new Image();
+tree4.src = "../static/assets/tree4.PNG";
+var tree5 = new Image();
+tree5.src = "../static/assets/tree5.PNG";
+var grass = new Image();
+grass.src = "../static/assets/grass.PNG";
 
-    for (color of bird_positions[data['game_id']]) {
-        console.log(color);
-        ctx.drawImage("../static/assets/"+color+"bird"+birdDir+".PNG",x,y,birdImgWidth,birdImgHeight);
+var cloud1 = new Image();
+cloud1.src = "../static/assets/cloud1.PNG";
+var cloud2 = new Image();
+cloud2.src = "../static/assets/cloud2.PNG";
+var cloud3 = new Image();
+cloud3.src = "../static/assets/cloud3.PNG";
+var cloud4 = new Image();
+cloud4.src = "../static/assets/cloud4.PNG";
+
+var birdImgs = {
+    red:new Image(),
+    green:new Image()
+}
+
+socket.on('draw', function (bird_positions) {
+    let game_id = data['game_id'];
+    for (color in bird_positions[game_id]) {
+        let info = bird_positions[game_id][color];
+
+        birdImgs[color].src = "../static/assets/"+color+"bird"+info['dir']+".PNG";
+        ctx.clearRect(0,0,c.width,c.height);
+        // background color
+        ctx.fillStyle = "rgb(187, 240, 237)";
+        ctx.fillRect(0, 0, c.width, c.height);
+
+        // background images (trees, grass, clouds)
+        ctx.drawImage(grass,0,c.height-50,c.width,50);
+        ctx.drawImage(tree1,20,c.height-220,100,300);
+        ctx.drawImage(tree2,175,c.height-320,100,330);
+        ctx.drawImage(tree3,800,c.height-320,100,320);
+        ctx.drawImage(tree4,500,c.height-190,100,200);
+        ctx.drawImage(tree5,890,c.height-190,100,200);
+        ctx.drawImage(cloud1,175,40,100,80);
+        ctx.drawImage(cloud2,600,70,150,120);
+        ctx.drawImage(cloud3,800,100,130,100);
+        ctx.drawImage(cloud4,50,150,120,100);
+
+
+        ctx.drawImage(birdImgs[color],
+        info['x'], info['y'], birdImgWidth, birdImgHeight);
     }
     
 }); 
-
-// dict
-// Color
-// key pressed
-// 
 
 var requestID;
 
 var drawGame = function() {
     window.cancelAnimationFrame(requestID);
     
-    socket.emit('frame')
+    data['key'] = null;
 
-
+    document.onkeydown = (e) => {
+        let key = e.code.toLowerCase().replace("arrow","");
+        console.log(c.width);
+        console.log(c.height);
+        if (['up','down','left','right'].includes(key)) {
+            data['key'] = key;
+        }
+    }
 
     setTimeout(() => {
+
+        socket.emit('frame',data);
         requestID = window.requestAnimationFrame(drawGame);
     }, 1000/fps);
 }
+drawGame();
 
 
 
