@@ -43,8 +43,14 @@ def roomPage(game_id):
 @app.route("/game/<game_id>", methods=['GET', 'POST'])
 def gamePage(game_id):
     if request.method == "POST":
-        return render_template("game.html", color=request.form.get("color"))
+        return render_template("game.html", color=request.form.get("color"), name=request.form.get("name"), opponent=request.form.get('opponent'))
     return redirect(url_for('root'))
+
+@app.route("/winner/<game_id>", methods=['GET', 'POST'])
+def winnerPage(game_id):
+    if request.method == "POST":
+        winner = request.form.get("winner")
+        return render_template("winner.html", winner=winner)
 
 ## socket-------------------------------------------------------
 # home socket-------------------------------------------------
@@ -100,7 +106,7 @@ bird_positions = {}
 #   <color>: {
 #       x: <x>,
 #       y: <y>,
-#       dir: <dir>
+#       dir: <dir>     
 #   }
 # } }
 
@@ -142,18 +148,24 @@ def frame(data):
     flapVel = -6
 
     # xVel
-    moveVel = 5
+    moveVel = 8
     
     fps = 60
     
     # in relation to fps
     yAcc = 16
+    xAcc = 24
     
     #kinematic variables
     kin_var = bird_positions[game_id][data['color']]
 
     #bounds, acceleration
     kin_var['yVel'] = min(kin_var['yVel']+yAcc/fps, fallVel)
+    if kin_var['xVel'] == 0:
+        sign = 1
+    else:
+        sign = kin_var['xVel']/abs(kin_var['xVel'])
+    kin_var['xVel'] = sign * max(0,abs(kin_var['xVel'])-xAcc/fps)
 
     #x-axis bounds
     #if bird goes beyond left bound
@@ -173,7 +185,6 @@ def frame(data):
             kin_var['yVel'] = 0
     
     if data['key'] == None:
-        kin_var['xVel'] = 0
         kin_var['dir'] = 'up'+kin_var['isLeft']
     else:
         if data['key'] == "up":
@@ -188,13 +199,27 @@ def frame(data):
             kin_var['isLeft'] = ''
             kin_var['dir'] = 'mid'+kin_var['isLeft']
         elif data['key'] == "down":
-            kin_var['yVel'] = flapVel*1.5 
+            kin_var['yVel'] = flapVel*1.2
+            kin_var['xVel'] = flapVel if bool(kin_var['isLeft']) else -1*flapVel # TODO fix
             kin_var['dir'] = 'down'+kin_var['isLeft']
+                 
 
         # adjust bird according to keystroke
     kin_var['x'] += kin_var['xVel']
     kin_var['y'] += kin_var['yVel']
     
+    emit('draw', bird_positions, to=game_id)
+
+@socketio.on('collided')
+def reset_bird(data):
+    game_id=data['game_id']
+
+    bird_positions[game_id]['green'] = {
+            'x': 0, 'y': 0, 'dir': 'up',
+            'xVel': 0, 'yVel':0, 'isLeft':""}
+    bird_positions[game_id]['red'] = {
+            'x': 800, 'y': 0, 'dir': 'upleft',
+            'xVel': 0, 'yVel':0, 'isLeft':"left"}
     emit('draw', bird_positions, to=game_id)
 
 

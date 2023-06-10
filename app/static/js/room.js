@@ -5,21 +5,6 @@
 
 
 // html manipulating ---------------------------------------------------------------------
-// var bird_color = document.getElementById("birdColor");
-
-// var display_chosen_color = () => {
-
-//     var selected_color = document.getElementById("selectedColor");
-//     selected_color.innerHTML = "<p>The color you selected is " + bird_color.value + "</p>";
-
-// }
-
-// bird_color.addEventListener("change", display_chosen_color);
-
-// var formChange = () => {
-//     color = document.getElementById("birdColor").value
-// }
-
 var color = null;
 
 var data = {
@@ -33,13 +18,9 @@ socket.on('connect', function () {
     socket.emit('sendusername', data);
 });
 
+var usernames= [];
 socket.on('message', function (message) {
-    // console.log(message);
-    // let msg_list = document.getElementById("msg");
-    // let li = document.createElement("li");
-    // li.textContent = message;
-    // msg_list.appendChild(li);
-
+    usernames = message;
     var msg = document.getElementById("msg");
     msg.innerHTML = "<p>User(s) in this room: " + message + "</p>";
 });
@@ -73,16 +54,21 @@ socket.on('readyToPlay', function (id) {
     inputField1.name = 'color';
     inputField1.value = color;
 
+    const inputField2 = document.createElement('input');
+    inputField2.type = 'text';
+    inputField2.name = 'name';
+    inputField2.value = data['username']
+
+    const inputField3 = document.createElement('input');
+    inputField3.type = 'text';
+    inputField3.name = 'opponent';
+    usernames.splice(usernames.indexOf(data['username']),1)
+    inputField3.value = usernames[0]
+
     form.appendChild(inputField1);
+    form.appendChild(inputField2);
+    form.appendChild(inputField3);
     document.body.appendChild(form);
 
     form.submit();
-
-    // console.log("READY TO PLAY");
-    // //console.log(window.location.host)
-    // host = window.location.host;
-
-
-    // window.location.pathname = destination;
-    //socket.emit('sendToGame');
 });

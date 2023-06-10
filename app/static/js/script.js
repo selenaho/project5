@@ -3,26 +3,33 @@
 // ////2023
 // P05
 
-var color = document.getElementById("color").innerHTML;
+var htmlcolor = document.getElementById("color").innerHTML;
+var username = document.getElementById("name").innerHTML;
+var opponent = document.getElementById("opponent").innerHTML;
+
 
 var data = {
     game_id: window.location.href.split("/").pop().slice(0,5),
-    color: color,
+    color: htmlcolor,
     key: null
 };
 
 var c = document.getElementById("canvas");
 var ctx = c.getContext("2d");
 
-var fps=60;
+var collided=false; // TODO: set to actual
 
-//poop dimensions
-var poopWidth = 40;
-var poopHeight = 35;
+var fps=60;
+var yAcc = 16;
+var fallVel = 6
 
 // bird dimensions
 var birdImgWidth = 200;
 var birdImgHeight = 220;
+
+//poop dimensions
+var poopWidth = 40;
+var poopHeight = 35;
 
 var socket = io();
 socket.on('connect', function () {
@@ -51,57 +58,191 @@ cloud3.src = "../static/assets/cloud3.PNG";
 var cloud4 = new Image();
 cloud4.src = "../static/assets/cloud4.PNG";
 
+var poop = new Image();
+poop.src = "../static/assets/poop.PNG";
+
 var birdImgs = {
     red:new Image(),
     green:new Image()
 }
 
+var poopData = {
+    green: {
+        active: false,
+        x: -1000,
+        y: -1000,
+        yVel: 0
+    },
+    red: {
+        active: false,
+        x: -1000,
+        y: -1000,
+        yVel: 0
+    }
+};
+
+var points = {
+    red:0,
+    green:0
+}
+    
+
 socket.on('draw', function (bird_positions) {
     let game_id = data['game_id'];
+
+    ctx.clearRect(0,0,c.width,c.height);
+    // background color
+    ctx.fillStyle = "rgb(187, 240, 237)";
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    // background images (trees, grass, clouds)
+    ctx.drawImage(grass,0,c.height-50,c.width,50);
+    ctx.drawImage(tree1,20,c.height-220,100,300);
+    ctx.drawImage(tree2,175,c.height-320,100,330);
+    ctx.drawImage(tree3,800,c.height-320,100,320);
+    ctx.drawImage(tree4,500,c.height-190,100,200);
+    ctx.drawImage(tree5,890,c.height-190,100,200);
+    ctx.drawImage(cloud1,175,40,100,80);
+    ctx.drawImage(cloud2,600,70,150,120);
+    ctx.drawImage(cloud3,800,100,130,100);
+    ctx.drawImage(cloud4,50,150,120,100);
+    
+    // collision
+    collideInfo = bird_positions[game_id][htmlcolor];
+
+
     for (color in bird_positions[game_id]) {
         let info = bird_positions[game_id][color];
 
         birdImgs[color].src = "../static/assets/"+color+"bird"+info['dir']+".PNG";
-        ctx.clearRect(0,0,c.width,c.height);
-        // background color
-        ctx.fillStyle = "rgb(187, 240, 237)";
-        ctx.fillRect(0, 0, c.width, c.height);
-
-        // background images (trees, grass, clouds)
-        ctx.drawImage(grass,0,c.height-50,c.width,50);
-        ctx.drawImage(tree1,20,c.height-220,100,300);
-        ctx.drawImage(tree2,175,c.height-320,100,330);
-        ctx.drawImage(tree3,800,c.height-320,100,320);
-        ctx.drawImage(tree4,500,c.height-190,100,200);
-        ctx.drawImage(tree5,890,c.height-190,100,200);
-        ctx.drawImage(cloud1,175,40,100,80);
-        ctx.drawImage(cloud2,600,70,150,120);
-        ctx.drawImage(cloud3,800,100,130,100);
-        ctx.drawImage(cloud4,50,150,120,100);
-
-
+        // draw bird
         ctx.drawImage(birdImgs[color],
         info['x'], info['y'], birdImgWidth, birdImgHeight);
+
+        if (poopData[color]['active']) {            
+            // if poop out of bounds then set active to false
+            if (poopData[color]['x'] > c.width || poopData[color]['x']+poopWidth < 0 || poopData[color]['y'] > c.height || poopData[color]['y']+poopHeight < 0) {
+                // reset procedure
+                poopData[color]['active'] = false;
+                poopData[color]['x'] = -1000
+                poopData[color]['yVel'] = 0
+
+            }
+            else {
+                ctx.drawImage(poop,poopData[color]['x'],poopData[color]['y'],poopWidth,poopHeight);
+                // accelerate
+                poopData[color]['yVel'] = Math.min(fallVel, poopData[color]['yVel']+=yAcc/fps);
+                // update y value
+                poopData[color]['y']+=poopData[color]['yVel'];
+            }
+        }        
+
+        // starting x val for poop
+        // check which way bird is facing, poop x-coord will vary bc of this    
+        if (poopData[color]['x'] == -1000) {    
+            if (info['dir'].charAt(info['dir'].length-1) ==="t") {
+                // left
+                poopData[color]['x'] = info['x']+.5*birdImgWidth;
+            }
+            else {
+                // right
+                poopData[color]['x'] = info['x']+.25*birdImgWidth;
+            }
+            // starting y value for poop
+            poopData[color]['y'] = info['y']+birdImgHeight-80;
+        }
+
+        //collide
+        if (poopData[color]['x'] < collideInfo['x']+birdImgWidth && poopData[color]['x'] > collideInfo['x']) {
+            if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+                // collided = true;
+            }
+            if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                // collided = true;
+            }
+        }
+        if (poopData[color]['x']+poopWidth < collideInfo['x']+birdImgWidth && poopData[color]['x']+poopWidth > collideInfo['x']) {
+            if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+                // collided = true;
+            }
+            if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                // collided = true;
+            }
+        }
     }
+
+    if (collided) {
+        if (data['color'] === "red") {
+            points['green'] +=1;
+            document.getElementById("greenpoints").innerHTML="Green: " + points['green'];
+        }
+        else {
+            points['red'] += 1;
+            document.getElementById("redpoints").innerHTML="Red: " + points['red'];
+        }
+        //check if either points['green'] or points['red'] == 5
+        //if either of the players won -->
+        if(points['green']==5 || points['red']==5) {
+            if (points['green'] == 5) {
+                colorWinner = 'green';
+            }
+            else {
+                colorWinner = 'red';
+            }
+            
+            if (colorWinner == htmlcolor) {
+                winner = username;
+            } 
+            else {
+                winner = opponent;
+            }
+            
+            destination = "/winner/" + data['game_id']
+            const form = document.createElement('form');
+
+            form.method = 'POST';
+            form.action = destination;
+            form.style.display = "none";
+            const inputField1 = document.createElement('input');
+            inputField1.type = 'text';
+            inputField1.name = 'winner';
+            inputField1.value = winner;
+
+            form.appendChild(inputField1);
+            document.body.appendChild(form);
+
+            form.submit();
+        }
+        collided = false;
+        socket.emit('collided', data);
+    }
+
     
 }); 
+
+document.onkeydown = (e) => {
+    let key = e.code.toLowerCase().replace("arrow","");
+    if (['up','down','left','right'].includes(key)) {
+        data['key'] = key;
+    }
+
+    if (key==='down') {
+        if (!poopData[htmlcolor]['active']) {
+            poopData[htmlcolor]['active'] = true;
+        }
+    }        
+}
+
+
+document.onkeyup = (e) => {
+    data['key'] = null;
+}
 
 var requestID;
 
 var drawGame = function() {
     window.cancelAnimationFrame(requestID);
     
-    data['key'] = null;
-
-    document.onkeydown = (e) => {
-        let key = e.code.toLowerCase().replace("arrow","");
-        console.log(c.width);
-        console.log(c.height);
-        if (['up','down','left','right'].includes(key)) {
-            data['key'] = key;
-        }
-    }
-
     setTimeout(() => {
 
         socket.emit('frame',data);
@@ -109,6 +250,7 @@ var drawGame = function() {
     }, 1000/fps);
 }
 drawGame();
+
 
 
 
@@ -159,8 +301,8 @@ drawGame();
 //     var bird = new Image();
 //     bird.src = "../static/assets/birdup.PNG";
 
-//     var poop = new Image();
-//     poop.src = "../static/assets/poop.PNG";
+    // var poop = new Image();
+    // poop.src = "../static/assets/poop.PNG";
 
 //     var tree1 = new Image();
 //     tree1.src = "../static/assets/tree1.PNG";
