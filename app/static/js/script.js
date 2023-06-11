@@ -120,6 +120,22 @@ socket.on('draw', function (bird_positions) {
         info['x'], info['y'], birdImgWidth, birdImgHeight);
 
         if (poopData[color]['active']) {            
+            // starting x val for poop
+            // check which way bird is facing, poop x-coord will vary bc of this    
+            if (poopData[color]['x'] == -1000) {    
+                if (info['dir'].charAt(info['dir'].length-1) ==="t") {
+                    // left
+                    poopData[color]['x'] = info['x']+.5*birdImgWidth;
+                }
+                else {
+                    // right
+                    poopData[color]['x'] = info['x']+.25*birdImgWidth;
+                }
+                // starting y value for poop
+                poopData[color]['y'] = info['y']+birdImgHeight-80;
+                // console.log("poop: "+poopData[color]['x']);
+                // console.log("bird: "+info['x']);
+            }
             // if poop out of bounds then set active to false
             if (poopData[color]['x'] > c.width || poopData[color]['x']+poopWidth < 0 || poopData[color]['y'] > c.height || poopData[color]['y']+poopHeight < 0) {
                 // reset procedure
@@ -129,28 +145,16 @@ socket.on('draw', function (bird_positions) {
 
             }
             else {
+                // console.log("poopReal: "+poopData[color]['x']);
+
                 ctx.drawImage(poop,poopData[color]['x'],poopData[color]['y'],poopWidth,poopHeight);
                 // accelerate
                 poopData[color]['yVel'] = Math.min(fallVel, poopData[color]['yVel']+=yAcc/fps);
                 // update y value
                 poopData[color]['y']+=poopData[color]['yVel'];
             }
-        }        
-
-        // starting x val for poop
-        // check which way bird is facing, poop x-coord will vary bc of this    
-        if (poopData[color]['x'] == -1000) {    
-            if (info['dir'].charAt(info['dir'].length-1) ==="t") {
-                // left
-                poopData[color]['x'] = info['x']+.5*birdImgWidth;
-            }
-            else {
-                // right
-                poopData[color]['x'] = info['x']+.25*birdImgWidth;
-            }
-            // starting y value for poop
-            poopData[color]['y'] = info['y']+birdImgHeight-80;
-        }
+        }     
+        
 
         //collide
         if (poopData[color]['x'] < collideInfo['x']+birdImgWidth && poopData[color]['x'] > collideInfo['x']) {
