@@ -85,6 +85,15 @@ var points = {
     red:0,
     green:0
 }
+
+socket.on('point_update', (bird_points) => {
+    points['red'] = bird_points['red'];
+    points['green'] = bird_points['green'];
+
+    document.getElementById("greenpoints").innerHTML="Green: " + bird_points['green'];
+
+    document.getElementById("redpoints").innerHTML="Red: " + bird_points['red'];
+})
     
 
 socket.on('draw', function (bird_positions) {
@@ -119,7 +128,7 @@ socket.on('draw', function (bird_positions) {
         ctx.drawImage(birdImgs[color],
         info['x'], info['y'], birdImgWidth, birdImgHeight);
 
-        if (poopData[color]['active']) {            
+        if (poopData[color]['active']) {
             // starting x val for poop
             // check which way bird is facing, poop x-coord will vary bc of this    
             if (poopData[color]['x'] == -1000) {    
@@ -132,7 +141,7 @@ socket.on('draw', function (bird_positions) {
                     poopData[color]['x'] = info['x']+.25*birdImgWidth;
                 }
                 // starting y value for poop
-                poopData[color]['y'] = info['y']+birdImgHeight-80;
+                poopData[color]['y'] = info['y']+birdImgHeight+80;
                 // console.log("poop: "+poopData[color]['x']);
                 // console.log("bird: "+info['x']);
             }
@@ -140,8 +149,8 @@ socket.on('draw', function (bird_positions) {
             if (poopData[color]['x'] > c.width || poopData[color]['x']+poopWidth < 0 || poopData[color]['y'] > c.height || poopData[color]['y']+poopHeight < 0) {
                 // reset procedure
                 poopData[color]['active'] = false;
-                poopData[color]['x'] = -1000
-                poopData[color]['yVel'] = 0
+                poopData[color]['x'] = -1000;
+                poopData[color]['yVel'] = 0;
 
             }
             else {
@@ -157,68 +166,83 @@ socket.on('draw', function (bird_positions) {
         
 
         //collide
-        if (poopData[color]['x'] < collideInfo['x']+birdImgWidth && poopData[color]['x'] > collideInfo['x']) {
-            if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
-                // collided = true;
+
+            if (poopData[color]['x'] < collideInfo['x']+birdImgWidth && poopData[color]['x'] > collideInfo['x']) {
+                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+                    collided = true;
+                    console.log(color)
+                }
+                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                    collided = true;
+                    console.log(color)
+
+                }
             }
-            if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
-                // collided = true;
+            if (poopData[color]['x']+poopWidth < collideInfo['x']+birdImgWidth && poopData[color]['x']+poopWidth > collideInfo['x']) {
+                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+                    collided = true;
+                    console.log(color)
+
+                }
+                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                    collided = true;
+                    console.log(color)
+
+                }
+                
             }
-        }
-        if (poopData[color]['x']+poopWidth < collideInfo['x']+birdImgWidth && poopData[color]['x']+poopWidth > collideInfo['x']) {
-            if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
-                // collided = true;
+            if (collided) {
+                poopData[color]['active'] = false;
+                poopData[color]['x'] = -1000;
+                poopData[color]['yVel'] = 0;
             }
-            if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
-                // collided = true;
-            }
-        }
     }
 
     if (collided) {
         if (data['color'] === "red") {
             points['green'] +=1;
-            document.getElementById("greenpoints").innerHTML="Green: " + points['green'];
         }
         else {
             points['red'] += 1;
-            document.getElementById("redpoints").innerHTML="Red: " + points['red'];
+
         }
         //check if either points['green'] or points['red'] == 5
         //if either of the players won -->
-        if(points['green']==5 || points['red']==5) {
-            if (points['green'] == 5) {
-                colorWinner = 'green';
-            }
-            else {
-                colorWinner = 'red';
-            }
-            
-            if (colorWinner == htmlcolor) {
-                winner = username;
-            } 
-            else {
-                winner = opponent;
-            }
-            
-            destination = "/winner/" + data['game_id']
-            const form = document.createElement('form');
-
-            form.method = 'POST';
-            form.action = destination;
-            form.style.display = "none";
-            const inputField1 = document.createElement('input');
-            inputField1.type = 'text';
-            inputField1.name = 'winner';
-            inputField1.value = winner;
-
-            form.appendChild(inputField1);
-            document.body.appendChild(form);
-
-            form.submit();
-        }
+        
         collided = false;
-        socket.emit('collided', data);
+        socket.emit('collided', [data, points]);
+    }
+
+    if(points['green']==5 || points['red']==5) {
+        if (points['green'] == 5) {
+            colorWinner = 'green';
+        }
+        else {
+            colorWinner = 'red';
+        }
+        
+        if (colorWinner == htmlcolor) {
+            winner = username;
+        } 
+        else {
+            winner = opponent;
+        }
+        
+        destination = "/winner/" + data['game_id']
+        const form = document.createElement('form');
+
+        form.method = 'POST';
+        form.action = destination;
+        form.style.display = "none";
+        const inputField1 = document.createElement('input');
+        inputField1.type = 'text';
+        inputField1.name = 'winner';
+        inputField1.value = winner;
+
+        form.appendChild(inputField1);
+        document.body.appendChild(form);
+
+        form.submit();
     }
 
     
@@ -226,16 +250,21 @@ socket.on('draw', function (bird_positions) {
 
 document.onkeydown = (e) => {
     let key = e.code.toLowerCase().replace("arrow","");
-    if (['up','down','left','right'].includes(key)) {
+    if (['up','left','right'].includes(key)) {
         data['key'] = key;
     }
 
     if (key==='down') {
         if (!poopData[htmlcolor]['active']) {
-            poopData[htmlcolor]['active'] = true;
+            socket.emit('pooped', data);
+            data['key']="down";
         }
     }        
 }
+
+socket.on('has_pooped', (color) => {
+        poopData[color]['active'] = true;
+})
 
 
 document.onkeyup = (e) => {

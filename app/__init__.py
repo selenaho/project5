@@ -37,13 +37,14 @@ def root():
 # TODO: check if gameid in games
 @app.route("/room/<game_id>", methods=['GET', 'POST'])
 def roomPage(game_id):
-    return render_template("room.html", username=get_flashed_messages()[0])
+    return render_template("room.html", game_id = game_id, username=get_flashed_messages()[0])
 
 
 @app.route("/game/<game_id>", methods=['GET', 'POST'])
 def gamePage(game_id):
     if request.method == "POST":
-        return render_template("game.html", color=request.form.get("color"), name=request.form.get("name"), opponent=request.form.get('opponent'))
+        return render_template("game.html", color=request.form.get("color"), 
+                               name=request.form.get("name"), opponent=request.form.get('opponent'))
     return redirect(url_for('root'))
 
 @app.route("/winner/<game_id>", methods=['GET', 'POST'])
@@ -52,8 +53,8 @@ def winnerPage(game_id):
         winner = request.form.get("winner")
         return render_template("winner.html", winner=winner)
 
-## socket-------------------------------------------------------
-# home socket-------------------------------------------------
+## socket-------------------------------------------------------------------------------------------------------
+# home socket--------------------------------------------------------------------------------------------
 @socketio.on('I want a game id')
 def create_game_id():
     #random letters
@@ -109,7 +110,10 @@ bird_positions = {}
 #       dir: <dir>     
 #   }
 # } }
-
+@socketio.on("pooped")
+def send_client_poop(data):
+    game_id=data['game_id']
+    emit("has_pooped", data['color'], to=game_id)
 
 @socketio.on("gamestart")
 def on_start(data):
@@ -211,16 +215,19 @@ def frame(data):
     emit('draw', bird_positions, to=game_id)
 
 @socketio.on('collided')
-def reset_bird(data):
-    game_id=data['game_id']
+def reset_bird(dataset):
+    game_id=dataset[0]['game_id']
 
-    bird_positions[game_id]['green'] = {
+    bird_positions[game_id]['red'] = {
             'x': 0, 'y': 0, 'dir': 'up',
             'xVel': 0, 'yVel':0, 'isLeft':""}
-    bird_positions[game_id]['red'] = {
+    bird_positions[game_id]['green'] = {
             'x': 800, 'y': 0, 'dir': 'upleft',
             'xVel': 0, 'yVel':0, 'isLeft':"left"}
     emit('draw', bird_positions, to=game_id)
+
+    colors = dataset[1]
+    emit("point_update",colors, to=game_id)
 
 
 if __name__ == "__main__":
