@@ -18,6 +18,7 @@ games = {}
 @app.route("/", methods=['GET', 'POST'])
 def root():
     if request.method == "GET":
+        print(games)
         return render_template("home.html")
     else:
         game_id = request.form.get("game_id")
@@ -26,7 +27,7 @@ def root():
         if len(game_id) != 5:
             return render_template("home.html", error = "Invalid join code")
         if game_id in games:
-            if len(games[game_id]) == 2:
+            if len(games[game_id]['usernames']) == 2:
                 return render_template("home.html", error = "Room full")
             if username in games[game_id]:
                 return render_template("home.html", error = "Name taken")
@@ -50,8 +51,9 @@ def gamePage(game_id):
 @app.route("/winner/<game_id>", methods=['GET', 'POST'])
 def winnerPage(game_id):
     if request.method == "POST":
+
         winner = request.form.get("winner")
-        return render_template("winner.html", winner=winner)
+        return render_template("winner.html", winner=winner,game_id=game_id)
 
 ## socket-------------------------------------------------------------------------------------------------------
 # home socket--------------------------------------------------------------------------------------------
@@ -229,6 +231,12 @@ def reset_bird(dataset):
     colors = dataset[1]
     emit("point_update",colors, to=game_id)
 
+# winner socket------------------------------------------------------------------
+@socketio.on("leave")
+def leaveRoom(game_id):
+    leave_room(game_id)
+    games.pop(game_id)
+    
 
 if __name__ == "__main__":
     app.debug = True

@@ -141,7 +141,7 @@ socket.on('draw', function (bird_positions) {
                     poopData[color]['x'] = info['x']+.25*birdImgWidth;
                 }
                 // starting y value for poop
-                poopData[color]['y'] = info['y']+birdImgHeight+80;
+                poopData[color]['y'] = info['y']+birdImgHeight-30;
                 // console.log("poop: "+poopData[color]['x']);
                 // console.log("bird: "+info['x']);
             }
@@ -168,23 +168,24 @@ socket.on('draw', function (bird_positions) {
         //collide
 
             if (poopData[color]['x'] < collideInfo['x']+birdImgWidth && poopData[color]['x'] > collideInfo['x']) {
-                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+                var raiseBottomYBy = -30;
+                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight+raiseBottomYBy && poopData[color]['y'] > collideInfo['y']) {
                     collided = true;
                     console.log(color)
                 }
-                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight+raiseBottomYBy && poopData[color]['y']+poopHeight > collideInfo['y']) {
                     collided = true;
                     console.log(color)
 
                 }
             }
-            if (poopData[color]['x']+poopWidth < collideInfo['x']+birdImgWidth && poopData[color]['x']+poopWidth > collideInfo['x']) {
-                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight && poopData[color]['y'] > collideInfo['y']) {
+            if (poopData[color]['x']+poopWidth < collideInfo['x']+birdImgWidth+raiseBottomYBy && poopData[color]['x']+poopWidth > collideInfo['x']) {
+                if (poopData[color]['y'] < collideInfo['y']+birdImgHeight+raiseBottomYBy && poopData[color]['y'] > collideInfo['y']) {
                     collided = true;
                     console.log(color)
 
                 }
-                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight && poopData[color]['y']+poopHeight > collideInfo['y']) {
+                if (poopData[color]['y']+poopHeight < collideInfo['y']+birdImgHeight+raiseBottomYBy && poopData[color]['y']+poopHeight > collideInfo['y']) {
                     collided = true;
                     console.log(color)
 
@@ -214,6 +215,7 @@ socket.on('draw', function (bird_positions) {
     }
 
     if(points['green']==5 || points['red']==5) {
+        
         if (points['green'] == 5) {
             colorWinner = 'green';
         }
